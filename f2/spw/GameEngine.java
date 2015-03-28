@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ public class GameEngine implements KeyListener, GameReporter{
 	private Timer timer;
 	
 	private long score = 0;
-	private double difficulty = 0.1;
+	private double difficulty = 0.05;
 	
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
@@ -68,11 +69,14 @@ public class GameEngine implements KeyListener, GameReporter{
 		
 		gp.updateGameUI(this);
 		
-		Rectangle2D.Double vr = v.getRectangle();
-		Rectangle2D.Double er;
+//		Rectangle2D.Double vr = v.getRectangle();
+//		Rectangle2D.Double er;
+		Ellipse2D.Double vr =  v.getEllipse();
+		Ellipse2D.Double er;
 		for(Enemy e : enemies){
-			er = e.getRectangle();
-			if(er.intersects(vr)){
+//			er = e.getRectangle();
+			er = e.getEllipse();
+			if(er.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
 				die();
 				return;
 			}
@@ -92,7 +96,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			v.move(1);
 			break;
 		case KeyEvent.VK_D:
-			difficulty += 0.1;
+			difficulty += 0.05;
 			break;
 		}
 	}
@@ -104,7 +108,6 @@ public class GameEngine implements KeyListener, GameReporter{
 	@Override
 	public void keyPressed(KeyEvent e) {
 		controlVehicle(e);
-		
 	}
 
 	@Override
