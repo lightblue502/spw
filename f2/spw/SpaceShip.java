@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 public class SpaceShip extends Sprite {
 	private Image image = null;
-	int step = 8;//int step = 8;
+	int step = 8;
 	public SpaceShip(int x, int y, int width, int height) {
 		super(x, y, width, height);
 		try {
@@ -23,11 +23,8 @@ public class SpaceShip extends Sprite {
 
 	@Override
 	public void draw(Graphics2D g) {
-		
-		
-		g.setColor(Color.GREEN);
+//		g.setColor(Color.GREEN);
 		g.drawImage(image, x, y, width, height, null);
-//		g.fillRect(x, y, width, height);
 	}
 
 	public void move(int direction){
