@@ -63,6 +63,11 @@ public class GameEngine implements KeyListener, GameReporter{
 		while(b_iter.hasNext()){
 			Bullet b = b_iter.next();
 			b.proceed();
+			
+			if(!b.isAlive()){
+				b_iter.remove();
+				gp.sprites.remove(b);
+			}
 		}
 		
 		Iterator<Enemy> e_iter = enemies.iterator();
@@ -84,8 +89,17 @@ public class GameEngine implements KeyListener, GameReporter{
 		Ellipse2D.Double vr =  v.getEllipse();
 		Ellipse2D.Double er;
 		for(Enemy e : enemies){
+		
 //			er = e.getRectangle();
 			er = e.getEllipse();
+			for(Bullet b :bullets){
+				Ellipse2D.Double br = b.getEllipse();
+				if(er.intersects(br.x, br.y, br.width, br.height)){
+					b.die();
+					e.die();
+					return;
+				}
+			}
 			if(er.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
 				die();
 				return;

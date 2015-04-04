@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 public class Bullet extends Sprite{
 	int step = 10;
+	private boolean alive = true;
 	public Bullet(int x, int y) {
 		super(x, y, 5, 10);
 	}
@@ -17,5 +18,10 @@ public class Bullet extends Sprite{
 	public void proceed(){
 		y -= step;
 	}
-
+	public void die(){
+		this.alive = false;
+	}
+	public boolean isAlive(){
+		return alive;
+	}
 }
