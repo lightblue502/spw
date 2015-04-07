@@ -14,35 +14,63 @@ import javax.swing.Timer;
 
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
-		
+	private final int SECOND = 1000; 
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();	
 	private SpaceShip v;	
 	private Timer timer;
-	
+	private int count = 0;
 	private long score = 0;
 	private double difficulty = 0.05;
-	
+	private int stage = 0;
+
 	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
 		this.v = v;		
 		gp.sprites.add(v);
 		
 		timer = new Timer(50, new ActionListener() {
-			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
 				process();
 			}
 		});
 		timer.setRepeats(true);
 		
+		
 	}
-	
+	private int countTimer = 0;
+	private void counter(){
+		countTimer += timer.getDelay();
+		if(countTimer %  SECOND == 0){
+			count++;
+		}
+			
+	}
+	public Timer getTimer(){
+		return timer;
+	}
 	public void start(){
 		timer.start();
 	}
-	
+	private void stageChanged(){
+		this.difficulty += 0.01;
+		stage++;
+	}
+	public boolean checkScore(int score){
+		if(this.score / score == stage){
+			if(this.score % score == 0){
+				System.out.println("test");
+				return true;
+			}
+		}
+		return false;
+	}
+	@Override
+	public int getTime() {
+		return count;
+	}
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
 		gp.sprites.add(e);
@@ -55,10 +83,10 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	
 	private void process(){
+		counter();
 		if(Math.random() < difficulty){
 			generateEnemy();
 		}
-		
 		Iterator<Bullet> b_iter = bullets.iterator();
 		while(b_iter.hasNext()){
 			Bullet b = b_iter.next();
@@ -79,9 +107,12 @@ public class GameEngine implements KeyListener, GameReporter{
 				e_iter.remove();
 				gp.sprites.remove(e);
 				score += 100;
+				
 			}
 		}
-		
+		if(checkScore(SCORE_STAGE_CHANGE)){
+			stageChanged();
+		}
 		gp.updateGameUI(this);
 		
 //		Rectangle2D.Double vr = v.getRectangle();
@@ -122,6 +153,9 @@ public class GameEngine implements KeyListener, GameReporter{
 		case KeyEvent.VK_SPACE:
 			generateBullet();
 			break;
+		case KeyEvent.VK_F1:
+			difficulty = 0;
+			break;
 		case KeyEvent.VK_D:
 			difficulty += 0.05;
 			break;
@@ -132,7 +166,9 @@ public class GameEngine implements KeyListener, GameReporter{
 	public long getScore(){
 		return score;
 	}
-	
+	public int getStage() {
+		return stage;
+	}
 	@Override
 	public void keyPressed(KeyEvent e) {
 		controlVehicle(e);
@@ -147,4 +183,5 @@ public class GameEngine implements KeyListener, GameReporter{
 	public void keyTyped(KeyEvent e) {
 		//do nothing		
 	}
+
 }

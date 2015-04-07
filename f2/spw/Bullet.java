@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class Bullet extends Sprite{
-	int step = 10;
+	int step = 20;
 	private boolean alive = true;
 	public Bullet(int x, int y) {
 		super(x, y, 5, 10);

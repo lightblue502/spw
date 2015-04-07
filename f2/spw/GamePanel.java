@@ -18,7 +18,7 @@ public class GamePanel extends JPanel {
 	private Image image;
 	Graphics2D big;
 	ArrayList<Sprite> sprites = new ArrayList<Sprite>();
-
+	private int curTime = -1;
 	public GamePanel() {
 	
 		bi = new BufferedImage(400, 600, BufferedImage.TYPE_INT_ARGB);
@@ -32,12 +32,30 @@ public class GamePanel extends JPanel {
 //		big.drawImage(image, 0, 0, null);
 //		big.setBackground(Color.BLUE);
 	}
-
-	public void updateGameUI(GameReporter reporter){
+	
+	public boolean checkState(GameReporter reporter, int delayTime){
+		if(reporter.getScore() % reporter.SCORE_STAGE_CHANGE == 0 ){
+			if( curTime == -1 ){
+				curTime = reporter.getTime();
+				return false;
+			}
+		}
+		else if(reporter.getTime() <= curTime + delayTime)
+			return true;
+		else curTime = -1;
+		return false;
+		
+	}
+	public void updateGameUI(GameReporter reporter) {
 		
 		big.clearRect(0, 0, 400, 600);
 		big.drawImage(image, 0, 0, null);
-		big.setColor(Color.WHITE);		
+		big.setColor(Color.LIGHT_GRAY);
+		if(checkState(reporter, 3)){
+			big.drawString(String.format("Stage %d", reporter.getStage()), 400 / 2 - 25, 600 / 2);
+		}
+		big.fillRect(295, 5, 65, 20);
+		big.setColor(Color.BLACK);
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 20);
 		
 		for(Sprite s : sprites){
@@ -45,6 +63,7 @@ public class GamePanel extends JPanel {
 		}
 		
 		repaint();
+		
 	}
 
 	@Override
