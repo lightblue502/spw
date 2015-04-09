@@ -9,7 +9,6 @@ public class Bullet extends Sprite{
 	public Bullet(int x, int y) {
 		super(x, y, 5, 10);
 	}
-
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(Color.RED);
@@ -18,7 +17,7 @@ public class Bullet extends Sprite{
 	public void proceed(){
 		y -= step;
 	}
-	public void die(){
+	public void disappear(){
 		this.alive = false;
 	}
 	public boolean isAlive(){

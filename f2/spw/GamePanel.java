@@ -33,7 +33,7 @@ public class GamePanel extends JPanel {
 //		big.setBackground(Color.BLUE);
 	}
 	
-	public boolean checkState(GameReporter reporter, int delayTime){
+	public boolean checkStage(GameReporter reporter, int delayTime){
 		if(reporter.getScore() % reporter.SCORE_STAGE_CHANGE == 0 ){
 			if( curTime == -1 ){
 				curTime = reporter.getTime();
@@ -51,7 +51,7 @@ public class GamePanel extends JPanel {
 		big.clearRect(0, 0, 400, 600);
 		big.drawImage(image, 0, 0, null);
 		big.setColor(Color.LIGHT_GRAY);
-		if(checkState(reporter, 3)){
+		if(checkStage(reporter, 3)){
 			big.drawString(String.format("Stage %d", reporter.getStage()), 400 / 2 - 25, 600 / 2);
 		}
 		big.fillRect(295, 5, 65, 20);

@@ -1,7 +1,7 @@
 package f2.spw;
 
 public interface GameReporter {
-	public static int SCORE_STAGE_CHANGE = 1000;
+	public final static int SCORE_STAGE_CHANGE = 1000;
 	long getScore();
 	int getStage();
 	int getTime();
