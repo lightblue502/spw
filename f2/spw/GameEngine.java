@@ -47,21 +47,8 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		});
 		timer.setRepeats(true);
-		
-		
 	}
-	private void counter(){
-		countTimer += timer.getDelay();
-		if(countTimer %  SECOND == 0){
-			count++;
-		}
-	}
-	public long getScore(){
-		return score;
-	}
-	public int getStage() {
-		return stage;
-	}
+							///	TIME ///
 	public Timer getTimer(){
 		return timer;
 	}
@@ -71,10 +58,16 @@ public class GameEngine implements KeyListener, GameReporter{
 	public void die(){
 		timer.stop();
 	}
-	private void stageChanged(){
-		this.difficulty += 0.01;
-		stage++;
+	public int getTime() {
+		return count;
 	}
+	private void counter(){
+		countTimer += timer.getDelay();
+		if(countTimer %  SECOND == 0){
+			count++;
+		}
+	}
+							/// SCORE ///
 	public boolean checkScore(int score){
 		if(this.score / score == stage){
 			if(this.score % score == 0){
@@ -84,24 +77,73 @@ public class GameEngine implements KeyListener, GameReporter{
 		}
 		return false;
 	}
-	@Override
-	public int getTime() {
-		return count;
+	public long getScore(){
+		return score;
+	}
+							///	STAGE ///
+	public int getStage() {
+		return stage;
 	}
 	
+	private void stageChanged(){
+		this.difficulty += 0.01;
+		stage++;
+	}
+							///	Enemy ///
 	private void generateEnemy(){
 		Enemy e = new Enemy((int)(Math.random()*390), 30);
 		gp.sprites.add(e);
 		enemies.add(e);
 	}
+	private void enemyProcess(){
+		if(Math.random() < difficulty){
+			generateEnemy();
+		}
+		Iterator<Enemy> e_iter = enemies.iterator();
+		while(e_iter.hasNext()){
+			Enemy e = e_iter.next();
+			e.proceed();
+			
+			if(!e.isAlive()){
+				e_iter.remove();
+				gp.sprites.remove(e);
+				score += 100;
+				
+			}
+		}
+	}
+							///	BULLET ///
 	private void generateBullet(){
 		Bullet b = new Bullet(v.x + (v.width / 2) - 2, v.y);
 		gp.sprites.add(b);
 		bullets.add(b);
+		if(v.getStatusBullet()){
+			upgradeBullet();
+		}
 	}
+	private void upgradeBullet(){
+		Bullet b1 = new Bullet(v.x , v.y);
+		Bullet b2 = new Bullet(v.x + (v.width), v.y);
+		gp.sprites.add(b1);
+		bullets.add(b1);
+		gp.sprites.add(b2);
+		bullets.add(b2);
+	}
+	private void bulletProcess(){
+		Iterator<Bullet> b_iter = bullets.iterator();
+		while(b_iter.hasNext()){
+			Bullet b = b_iter.next();
+			b.proceed();
+			
+			if(!b.isAlive()){
+				b_iter.remove();
+				gp.sprites.remove(b);
+			}
+		}
+	}
+								///	ITEM ///
 	private void generateItem(){
 		int random = (int)(Math.random()*3);
-		System.out.println(random);
 		if(random == 0){
 			ItemHeart itemHeart = new ItemHeart((int)(Math.random()*390), 30, 25, 25,"heart");
 			gp.sprites.add(itemHeart);
@@ -133,50 +175,20 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 	}
-	private void bulletProcess(){
-		Iterator<Bullet> b_iter = bullets.iterator();
-		while(b_iter.hasNext()){
-			Bullet b = b_iter.next();
-			b.proceed();
-			
-			if(!b.isAlive()){
-				b_iter.remove();
-				gp.sprites.remove(b);
-			}
-		}
-	}
-	private void enemyProcess(){
-		if(Math.random() < difficulty){
-			generateEnemy();
-		}
-		Iterator<Enemy> e_iter = enemies.iterator();
-		while(e_iter.hasNext()){
-			Enemy e = e_iter.next();
-			e.proceed();
-			
-			if(!e.isAlive()){
-				e_iter.remove();
-				gp.sprites.remove(e);
-				score += 100;
-				
-			}
-		}
-	}
+					/// process intersects object ///
 	private void process(){
-//		Rectangle2D.Double vr = v.getRectangle();
-//		Rectangle2D.Double er;
 		Ellipse2D.Double vr =  v.getEllipse();
 		Ellipse2D.Double eEllip;
 		Ellipse2D.Double itemEllip;
 		for(Item item : items){
 			itemEllip = item.getEllipse();
 			if(itemEllip.intersects(vr.x, vr.y, vr.width, vr.height)){
+				v.upgrade(item);
 				item.disappear();
 				return;
 			}
 		}
 		for(Enemy e : enemies){
-//			er = e.getRectangle();
 			eEllip = e.getEllipse();
 			for(Bullet b :bullets){
 				Ellipse2D.Double bEllip = b.getEllipse();
