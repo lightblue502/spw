@@ -12,8 +12,9 @@ public class Main {
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		SpaceShip v = new SpaceShip(160, 530, 70, 70);
+		LifePoint lifePoint = new LifePoint(100);
 		GamePanel gp = new GamePanel();
-		GameEngine engine = new GameEngine(gp, v);
+		GameEngine engine = new GameEngine(gp, v , lifePoint);
 
 		frame.addKeyListener(engine);
 		frame.getContentPane().add(gp, BorderLayout.CENTER);

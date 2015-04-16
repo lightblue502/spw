@@ -5,4 +5,8 @@ public class ItemBullet extends Item{
 		super(x, y, width, height,name);
 		this.setImage("f2/spw/pics/bullet_item.png");
 	}
+	public void getItem(GameEngine g) {
+		g.setBulletUpgrade(true);
+		g.startDelayTimeItem();
+	}
 }

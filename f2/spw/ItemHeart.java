@@ -6,5 +6,9 @@ public class ItemHeart extends Item {
 		super(x, y, width, height, name);
 		this.setImage("f2/spw/pics/heart_item.png");
 	}
-
+	public void getItem(GameEngine g) {
+		System.out.println("getItem heart");
+		g.lifePoint.increaseLifePoint();
+	}
+	
 }

@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
-public class Item extends Sprite{
+public abstract class Item extends Sprite{
 	private int step = 12;
 	private boolean alive = true;
 	private String name;
@@ -33,4 +33,5 @@ public class Item extends Sprite{
 	public boolean isAlive(){
 		return alive;
 	}
+	public abstract void getItem(GameEngine g);
 }

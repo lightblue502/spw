@@ -5,5 +5,6 @@ public interface GameReporter {
 	long getScore();
 	int getStage();
 	int getTime();
+	int getLifePoint();
 
 }

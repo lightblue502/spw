@@ -19,18 +19,19 @@ public class GameEngine implements KeyListener, GameReporter{
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Item> items = new ArrayList<Item>();
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();	
-	private SpaceShip v;	
+	private SpaceShip v;
+	public LifePoint lifePoint;
 	private Timer timer;
 	private int count = 0;
 	private long score = 0;
 	private double difficulty = 0.05;
-
 	private int stage = 0;
 	private int countTimer = 0;
-
-	public GameEngine(GamePanel gp, SpaceShip v) {
+	private boolean statusBulletUpgrade = false;
+	public GameEngine(GamePanel gp, SpaceShip v,LifePoint lifePoint) {
 		this.gp = gp;
 		this.v = v;		
+		this.lifePoint= lifePoint;
 		gp.sprites.add(v);
 		
 		timer = new Timer(50, new ActionListener() {
@@ -41,14 +42,21 @@ public class GameEngine implements KeyListener, GameReporter{
 				bulletProcess();
 				enemyProcess();
 				process();
-				if(checkScore(SCORE_STAGE_CHANGE)){
+				if(checkScore(SCORE_STAGE_CHANGE))
 					stageChanged();
-				}
 			}
 		});
 		timer.setRepeats(true);
 	}
-							///	TIME ///
+							/// LifePoint ///
+	public int getLifePoint(){
+		return lifePoint.getLifePoint();
+	}
+	public void checkLifePoint(){
+		if(lifePoint.getLifePoint() <= 0 )
+			die();
+	}
+							/// TIME ///
 	public Timer getTimer(){
 		return timer;
 	}
@@ -71,7 +79,6 @@ public class GameEngine implements KeyListener, GameReporter{
 	public boolean checkScore(int score){
 		if(this.score / score == stage){
 			if(this.score % score == 0){
-				System.out.println("test");
 				return true;
 			}
 		}
@@ -113,21 +120,24 @@ public class GameEngine implements KeyListener, GameReporter{
 		}
 	}
 							///	BULLET ///
+	public void setBulletUpgrade(boolean statusBulletUpgrade){
+		this.statusBulletUpgrade  = statusBulletUpgrade;
+	}
+	public boolean isBulletUpgrade(){
+		return statusBulletUpgrade;
+	}
 	private void generateBullet(){
 		Bullet b = new Bullet(v.x + (v.width / 2) - 2, v.y);
 		gp.sprites.add(b);
 		bullets.add(b);
-		if(v.getStatusBullet()){
-			upgradeBullet();
+		if(isBulletUpgrade()){
+			Bullet b1 = new Bullet(v.x , v.y);
+			Bullet b2 = new Bullet(v.x + (v.width), v.y);
+			gp.sprites.add(b1);
+			bullets.add(b1);
+			gp.sprites.add(b2);
+			bullets.add(b2);
 		}
-	}
-	private void upgradeBullet(){
-		Bullet b1 = new Bullet(v.x , v.y);
-		Bullet b2 = new Bullet(v.x + (v.width), v.y);
-		gp.sprites.add(b1);
-		bullets.add(b1);
-		gp.sprites.add(b2);
-		bullets.add(b2);
 	}
 	private void bulletProcess(){
 		Iterator<Bullet> b_iter = bullets.iterator();
@@ -175,6 +185,16 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 	}
+	private Timer delayTimeItem = new Timer(1000*3, new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			setBulletUpgrade(false);
+			delayTimeItem.stop();
+		}
+	});
+	public void startDelayTimeItem(){
+		delayTimeItem.start();
+	}
 					/// process intersects object ///
 	private void process(){
 		Ellipse2D.Double vr =  v.getEllipse();
@@ -183,7 +203,8 @@ public class GameEngine implements KeyListener, GameReporter{
 		for(Item item : items){
 			itemEllip = item.getEllipse();
 			if(itemEllip.intersects(vr.x, vr.y, vr.width, vr.height)){
-				v.upgrade(item);
+//				upgrade(item);
+				item.getItem(this);
 				item.disappear();
 				return;
 			}
@@ -199,7 +220,9 @@ public class GameEngine implements KeyListener, GameReporter{
 				}
 			}
 			if(eEllip.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
-				die();
+				lifePoint.decreaseLifePoint();
+				e.disappear();
+				checkLifePoint();
 				return;
 			}
 		}

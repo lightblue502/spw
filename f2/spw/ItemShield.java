@@ -6,5 +6,8 @@ public class ItemShield extends Item{
 		super(x, y, width, height, name);
 		this.setImage("f2/spw/pics/shield_item.png");
 	}
-
+	public void getItem(GameEngine g) {
+			System.out.println("getItem shield");
+	}
+	
 }

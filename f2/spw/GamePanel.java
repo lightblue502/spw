@@ -55,7 +55,12 @@ public class GamePanel extends JPanel {
 			big.drawString(String.format("Stage %d", reporter.getStage()), 400 / 2 - 25, 600 / 2);
 		}
 		big.fillRect(295, 5, 65, 20);
+		big.setColor(Color.RED);
+		if(reporter.getLifePoint() >=  100)
+			big.fillRect(10, 7, 100, 20);
+		else big.fillRect(10, 7, reporter.getLifePoint(), 20);
 		big.setColor(Color.BLACK);
+		big.drawString(String.format("%d", reporter.getLifePoint()), 10, 20);
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 20);
 		
 		for(Sprite s : sprites){
