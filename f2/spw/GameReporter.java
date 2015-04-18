@@ -6,5 +6,6 @@ public interface GameReporter {
 	int getStage();
 	int getTime();
 	int getLifePoint();
+	int getHeart();
 
 }

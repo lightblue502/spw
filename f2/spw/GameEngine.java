@@ -49,13 +49,23 @@ public class GameEngine implements KeyListener, GameReporter{
 		timer.setRepeats(true);
 	}
 							/// LifePoint ///
+	public int getHeart(){
+		return lifePoint.getHeart();
+	}
 	public int getLifePoint(){
 		return lifePoint.getLifePoint();
 	}
-	public void checkLifePoint(){
-		if(lifePoint.getLifePoint() <= 0 )
+	public void checkLife(){
+		if(lifePoint.getHeart() <= 0){
+			gp.updateGameUI(this);
 			die();
+		}
 	}
+//	public void checkLifePoint(){
+//		if(lifePoint.getLifePoint() <= 0 ){
+//			
+//		}
+//	}
 							/// TIME ///
 	public Timer getTimer(){
 		return timer;
@@ -222,7 +232,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			if(eEllip.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
 				lifePoint.decreaseLifePoint();
 				e.disappear();
-				checkLifePoint();
+				checkLife();
 				return;
 			}
 		}
