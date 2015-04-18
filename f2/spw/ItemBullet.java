@@ -7,6 +7,6 @@ public class ItemBullet extends Item{
 	}
 	public void getItem(GameEngine g) {
 		g.setBulletUpgrade(true);
-		g.startDelayTimeItem();
+		g.startDelayItem(3);
 	}
 }

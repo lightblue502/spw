@@ -15,11 +15,11 @@ import javax.swing.Timer;
 public class GameEngine implements KeyListener, GameReporter{
 	GamePanel gp;
 	private final int SECOND = 1000; 
-	private final double RANDOM_ITEM =  0.01;
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Item> items = new ArrayList<Item>();
 	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();	
 	private SpaceShip v;
+	private Shield shield;
 	public LifePoint lifePoint;
 	private Timer timer;
 	private int count = 0;
@@ -47,6 +47,19 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		});
 		timer.setRepeats(true);
+	}
+							/// Shield ///
+	public void generateShield(){
+		System.out.println("genshield");
+		shield = new Shield(v);
+		gp.sprites.add(shield);
+		shield.work(this);
+	}
+
+	public void removeShield(){
+		System.out.println("remove Shield");
+		gp.sprites.remove(shield);
+		lifePoint.isChange(true);
 	}
 							/// LifePoint ///
 	public int getHeart(){
@@ -179,6 +192,7 @@ public class GameEngine implements KeyListener, GameReporter{
 			items.add(itemBullet);
 		}
 	}
+	private final double RANDOM_ITEM = 0.01;
 	private void itemProcess(){
 		if(Math.random() < RANDOM_ITEM){
 			generateItem();
@@ -195,15 +209,21 @@ public class GameEngine implements KeyListener, GameReporter{
 			}
 		}
 	}
-	private Timer delayTimeItem = new Timer(1000*3, new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			setBulletUpgrade(false);
-			delayTimeItem.stop();
-		}
-	});
-	public void startDelayTimeItem(){
-		delayTimeItem.start();
+	private Timer delayItem;
+	public void setItemDelay(int time){
+		delayItem = new Timer(1000*time, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setBulletUpgrade(false);
+				removeShield();
+				delayItem.stop();
+			}
+		});
+		
+	}
+	public void startDelayItem(int time){
+		setItemDelay(time);
+		delayItem.start();
 	}
 					/// process intersects object ///
 	private void process(){

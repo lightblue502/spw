@@ -1,10 +1,6 @@
 package f2.spw;
 
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.Timer;
 
 public class SpaceShip extends Sprite {
 	int step = 8;
@@ -15,10 +11,9 @@ public class SpaceShip extends Sprite {
 
 	@Override
 	public void draw(Graphics2D g) {
-//		g.setColor(Color.GREEN);
 		g.drawImage(this.image, x, y, width, height, null);
+			
 	}
-
 	public void move(int direction){
 		x += (step * direction);
 		if(x < 0)
