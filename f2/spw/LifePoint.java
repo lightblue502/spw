@@ -1,21 +1,21 @@
 package f2.spw;
 
 public class LifePoint {
-	private int lifePoint = 300;
+	private int lifePoint;
 	private int initLifePoint;
 	private boolean isChange = true;
-	private int heart = 3;
+	private int heart;
 	public LifePoint(int lifePoint) {
 		this.lifePoint = lifePoint;
 		initLifePoint = lifePoint;
 	}
-	public void decreaseLifePoint(){
+	public void damage(int num){
 		if(isChange)
-			this.lifePoint -= 30;
+			this.lifePoint -= num;
 	}
-	public void increaseLifePoint(){
+	public void addLife(int num){
 		if(isChange)
-			this.lifePoint += 100;
+			this.lifePoint += num;
 	}
 	public void setLifePoint(int lifePoint){
 		this.lifePoint = lifePoint;
@@ -33,7 +33,7 @@ public class LifePoint {
 		return this.heart;
 	}
 	public void decreaseHeart(){
-		this.heart --;
+		this.heart--;
 	}
 	public void isChange(boolean status){
 		this.isChange = status;

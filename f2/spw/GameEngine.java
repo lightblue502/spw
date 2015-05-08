@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -17,33 +16,38 @@ public class GameEngine implements KeyListener, GameReporter{
 	private final int SECOND = 1000; 
 	private ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	private ArrayList<Item> items = new ArrayList<Item>();
-	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();	
+	private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+	private ArrayList<BulletBoss> bulletsBoss = new ArrayList<BulletBoss>();
+	private EnemyBoss eb;
 	private SpaceShip v;
 	private Shield shield;
-	public LifePoint lifePoint;
 	private Timer timer;
 	private int count = 0;
 	private long score = 0;
 	private double difficulty = 0.05;
-	private int stage = 0;
+	private int stage = 1;
 	private int countTimer = 0;
 	private boolean statusBulletUpgrade = false;
-	public GameEngine(GamePanel gp, SpaceShip v,LifePoint lifePoint) {
+	private boolean bossBorn = false;
+	public GameEngine(GamePanel gp, SpaceShip v) {
 		this.gp = gp;
 		this.v = v;		
-		this.lifePoint= lifePoint;
 		gp.sprites.add(v);
-		
+		eb = new EnemyBoss(0, 30);
 		timer = new Timer(50, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				
 				counter();
 				itemProcess();
 				bulletProcess();
 				enemyProcess();
+				enemyBossProcess();
+				bulletBossProcess();
 				process();
-				if(checkScore(SCORE_STAGE_CHANGE))
+				if(checkScore(SCORE_STAGE_CHANGE)){
 					stageChanged();
+				}
 			}
 		});
 		timer.setRepeats(true);
@@ -59,26 +63,38 @@ public class GameEngine implements KeyListener, GameReporter{
 	public void removeShield(){
 		System.out.println("remove Shield");
 		gp.sprites.remove(shield);
-		lifePoint.isChange(true);
+		v.removeShield();
 	}
 							/// LifePoint ///
 	public int getHeart(){
-		return lifePoint.getHeart();
+		return v.getHeart();
 	}
 	public int getLifePoint(){
-		return lifePoint.getLifePoint();
+		return v.getLife();
 	}
+	public void spaceShipAddLife(){
+		v.addLife();
+	}
+	public int getLifePointBoss() {
+		return eb.getLife();
+	}
+	public int getHeartBoss() {
+		return eb.getHeart();
+	}
+
 	public void checkLife(){
-		if(lifePoint.getHeart() <= 0){
+		if(v.getHeart() <= 0){
 			gp.updateGameUI(this);
 			die();
 		}
 	}
-//	public void checkLifePoint(){
-//		if(lifePoint.getLifePoint() <= 0 ){
-//			
-//		}
-//	}
+	public void checkLifeBoss(){
+		if(eb.getHeart() <= 0){
+			System.out.println(" boss disappear");
+			eb.disappear();
+			BOSSdie();
+		}
+	}
 							/// TIME ///
 	public Timer getTimer(){
 		return timer;
@@ -87,6 +103,11 @@ public class GameEngine implements KeyListener, GameReporter{
 		timer.start();
 	}
 	public void die(){
+		new GameEnd("GAME OVER", score);
+		timer.stop();
+	}
+	public void BOSSdie(){
+		new GameEnd("END GAME", score);
 		timer.stop();
 	}
 	public int getTime() {
@@ -100,7 +121,9 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 							/// SCORE ///
 	public boolean checkScore(int score){
-		if(this.score / score == stage){
+		if(this.score == 0){
+			return false; 
+		}else if(this.score / score == stage){
 			if(this.score % score == 0){
 				return true;
 			}
@@ -111,13 +134,16 @@ public class GameEngine implements KeyListener, GameReporter{
 		return score;
 	}
 							///	STAGE ///
+	public boolean bossBorn(){
+		return bossBorn;
+	}
 	public int getStage() {
 		return stage;
 	}
-	
 	private void stageChanged(){
-		this.difficulty += 0.01;
+		this.difficulty += 0.05;
 		stage++;
+		
 	}
 							///	Enemy ///
 	private void generateEnemy(){
@@ -141,6 +167,28 @@ public class GameEngine implements KeyListener, GameReporter{
 				
 			}
 		}
+	}						/// EnermyBoss ///
+	public void checkBoss(){
+		if(stage > 5){
+			stage = 5;
+			bossBorn = true;
+		}
+	}
+	private void enemyBossProcess(){
+		checkBoss();
+		if(bossBorn){
+			gp.sprites.add(eb);
+			eb.proceed();
+			eb.enermyShoot(this);
+			if(!eb.isAlive()){
+				bossBorn = false;
+				eb.reset();
+				score += 1000;
+			}
+		}else {
+			gp.sprites.remove(eb);
+		}
+		
 	}
 							///	BULLET ///
 	public void setBulletUpgrade(boolean statusBulletUpgrade){
@@ -148,6 +196,11 @@ public class GameEngine implements KeyListener, GameReporter{
 	}
 	public boolean isBulletUpgrade(){
 		return statusBulletUpgrade;
+	}
+	public void generateEnermyBullet(int x , int y){
+		BulletBoss bb = new BulletBoss(x , y);
+		gp.sprites.add(bb);
+		bulletsBoss.add(bb);
 	}
 	private void generateBullet(){
 		Bullet b = new Bullet(v.x + (v.width / 2) - 2, v.y);
@@ -171,6 +224,18 @@ public class GameEngine implements KeyListener, GameReporter{
 			if(!b.isAlive()){
 				b_iter.remove();
 				gp.sprites.remove(b);
+			}
+		}
+	}
+	private void bulletBossProcess(){
+		Iterator<BulletBoss> bb_iter = bulletsBoss.iterator();
+		while(bb_iter.hasNext()){
+			BulletBoss bb = bb_iter.next();
+			bb.proceed();
+			
+			if(!bb.isAlive()){
+				bb_iter.remove();
+				gp.sprites.remove(bb);
 			}
 		}
 	}
@@ -228,29 +293,48 @@ public class GameEngine implements KeyListener, GameReporter{
 					/// process intersects object ///
 	private void process(){
 		Ellipse2D.Double vr =  v.getEllipse();
+		Ellipse2D.Double bossR =  eb.getEllipse();
 		Ellipse2D.Double eEllip;
 		Ellipse2D.Double itemEllip;
 		for(Item item : items){
 			itemEllip = item.getEllipse();
 			if(itemEllip.intersects(vr.x, vr.y, vr.width, vr.height)){
-//				upgrade(item);
+				// itemUpgrade
 				item.getItem(this);
 				item.disappear();
 				return;
+			}
+		}
+		for(BulletBoss bb :bulletsBoss){
+			Ellipse2D.Double bbEllip = bb.getEllipse();
+			// bulletBoss hit spaceShip 
+			if(bbEllip.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
+				v.hit(10);
+				checkLife();
+			}
+		}
+		for(Bullet b :bullets){
+			Ellipse2D.Double bEllip = b.getEllipse();
+			// bullet hit boss 
+			if(bEllip.intersects(bossR.x, bossR.y, bossR.width, bossR.height)){
+				eb.hit(10);
+				b.disappear();
+				checkLifeBoss();
 			}
 		}
 		for(Enemy e : enemies){
 			eEllip = e.getEllipse();
 			for(Bullet b :bullets){
 				Ellipse2D.Double bEllip = b.getEllipse();
+				// bullet hit enermy
 				if(eEllip.intersects(bEllip.x, bEllip.y, bEllip.width, bEllip.height)){
-					b.disappear();
-					e.disappear();
-					return;
-				}
+						b.disappear();	
+						e.disappear();
+					}
 			}
+			//enermy hit spaceShip
 			if(eEllip.intersects(vr.x+20, vr.y+20, vr.width /2, vr.height /2)){
-				lifePoint.decreaseLifePoint();
+				v.hit(30);
 				e.disappear();
 				checkLife();
 				return;
@@ -274,6 +358,12 @@ public class GameEngine implements KeyListener, GameReporter{
 			break;
 		case KeyEvent.VK_D:
 			difficulty += 0.05;
+			break;
+		case KeyEvent.VK_P:
+			timer.stop();
+			break;
+		case KeyEvent.VK_O:
+			timer.start();
 			break;
 		}
 		

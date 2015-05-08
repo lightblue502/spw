@@ -7,5 +7,7 @@ public interface GameReporter {
 	int getTime();
 	int getLifePoint();
 	int getHeart();
-
+	int getLifePointBoss();
+	int getHeartBoss();
+	boolean bossBorn();
 }

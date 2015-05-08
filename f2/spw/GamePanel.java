@@ -49,6 +49,32 @@ public class GamePanel extends JPanel {
 		return false;
 		
 	}
+	public void drawHeart(int num,int initX, int initY){
+		int positionHeart = initX;
+		for(int i = 0 ;i < num ;i++){
+			big.drawImage(imageHeart, 10+positionHeart, initY, 20, 20, null);
+			positionHeart+=22;
+		}
+	}
+	public void drawHp(int initX, int initY,int lifePoint,Color bgColor,Color textColor){
+
+		big.setColor(bgColor);
+		if(lifePoint <=  0)
+			big.fillRect(initX, initY, 0, 20);
+		else if(lifePoint % 100 == 0){
+			big.fillRect(initX, initY, 100, 20);
+		}else big.fillRect(initX, initY, lifePoint % 100, 20);
+		big.setColor(textColor);
+		big.drawString(String.format("%d", lifePoint), initX, initY + 13);
+	}
+	public void drawUILifeBoss(GameReporter reporter){
+		drawHp(10, 27,reporter.getLifePointBoss(),Color.GRAY, Color.BLACK);
+		drawHeart(reporter.getHeartBoss(), 0 , 7);
+	}
+	public void drawUILifeSpace(GameReporter reporter){
+		drawHp(10,bi.getHeight()-30,reporter.getLifePoint(),Color.RED, Color.BLACK);
+		drawHeart(reporter.getHeart(), 0 , bi.getHeight() - 50);
+	}
 	public void updateGameUI(GameReporter reporter) {
 		big.clearRect(0, 0, 400, 600);
 		big.drawImage(imageBg, 0, 0, null);
@@ -57,30 +83,16 @@ public class GamePanel extends JPanel {
 			big.drawString(String.format("Stage %d", reporter.getStage()), 400 / 2 - 25, 600 / 2);
 		}
 		big.fillRect(295, 5, 65, 20);
-		big.setColor(Color.RED);
 		
-		if(reporter.getLifePoint() <=  0)
-			big.fillRect(10, 27, 0, 20);
-		else if(reporter.getLifePoint() % 100 == 0){
-			big.fillRect(10, 27, 100, 20);
-		}else big.fillRect(10, 27, reporter.getLifePoint() % 100, 20);
-		
-		big.setColor(Color.BLACK);
-		big.drawString(String.format("%d", reporter.getLifePoint()), 10, 40);
-		int positionHeart = 0;
-		for(int i = 0 ;i < reporter.getHeart() ;i++){
-			big.drawImage(imageHeart, 10+positionHeart, 7, 20, 20, null);
-			positionHeart+=22;
+		drawUILifeSpace(reporter);
+		if(reporter.bossBorn()){
+			drawUILifeBoss(reporter);
 		}
-		
-		
-		
+		big.setColor(Color.BLACK);
 		big.drawString(String.format("%08d", reporter.getScore()), 300, 20);
-		
 		for(Sprite s : sprites){
 			s.draw(big);
 		}
-		
 		repaint();
 		
 	}

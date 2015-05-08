@@ -14,6 +14,6 @@ public class Shield extends Sprite{
 		g.drawRoundRect(v.x, v.y, 70 , 70, 30, 30);
 	}
 	public void work(GameEngine g){
-		g.lifePoint.isChange(false);
+		v.lifePoint.isChange(false);
 	}
 }

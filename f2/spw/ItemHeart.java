@@ -8,7 +8,7 @@ public class ItemHeart extends Item {
 	}
 	public void getItem(GameEngine g) {
 		System.out.println("getItem heart");
-		g.lifePoint.increaseLifePoint();
+		g.spaceShipAddLife();
 	}
 	
 }
